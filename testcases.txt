@@ -1,0 +1,278 @@
+
+Testing Token Types:
+
+
+Test Word:
+	
+Testing for capital and lower case
+Input: 			./tokenizer "AZaz"
+Expected Output: 	word: "AZaz"
+
+Testing for alpha-numeric characters
+Input: 			./tokenizer "a1234Cmlz"
+Expected Output:	word: "a1234miz"
+
+Test Decimal:
+
+Testing for normal numbers
+Input:			./tokenizer "112358132134"
+Expected Output:	decimal integer: "112358132134"
+
+Testing breaking inbetween numbers
+Input:			./tokenizer "11235HELLOWORLD8132134"
+Expected Output		decimal integer: "11235"
+			word: "HELLOWORLD8132134"
+
+Testing for not octal
+Input:			./tokenizer "0112358132134"
+Expected Output:	decimal integer: "0112358132134"
+
+Testing Float:
+
+Testing for '.' in Float
+Input:			./tokenizer "0.11235"
+Expected Output:	floating point: "0.11235"
+
+Testing for '.' as last char
+Input:			./tokenizer "011235."
+Expected Output:	octal integer: "011235"
+			structure member: "."
+
+Testing for '.' as first char (. should be read as structure member first)
+Input:			./tokenizer ".11235"
+Expected Output: 	structure member: "."
+			decimal integer: "11235"
+
+Testing for exponential in float
+Input:			./tokenizer "3.14159e10"
+Expected Output:	floating point: "3.1459e10"
+
+Testing for negative exponential in float
+Input:			./tokenizer "3.14159e-10"
+Expected Output:	"3.14159e-10"
+
+Testing for no digits after exponential
+Input:			./tokenizer "3.14159e"
+Expected Output:	floating point: "3.14159"
+			word: "e"
+
+Testing for no digits after negative exponential
+Input:			./tokenizer "3.14159e-"
+Expected Output:	floating point: "3.14159"
+			word: "e"
+			subtraction: "-"
+
+Testing for Octal
+
+Testing octal and not decimal
+Input:			./tokenizer "01234567"
+Expected Output:	octal integer: "01234567"
+
+Testing decimal not octal
+Input:			./tokenizer "0123456789"
+Expected Output:	decimal integer: "0123456789"
+
+Testing for Hexadecimal
+
+Testing for lowercase x
+Input:			./tokenizer "0x123456789"
+Expected Output:	hexadecimal integer: "0x123456789"
+
+Testing for uppercase x
+Input:			./tokenizer "0X123456789"
+Expected Output:	hexadecimal integer: "0X123456789"
+
+Testing for uppercase letters
+Input:			./tokenizer "0xABCDEF"
+Expected Output:	hexadecimal integer: "0xABCDEF"
+
+Testing for lowercase letters
+Input:			./tokenizer "0xabcdef"
+Expected Output:	hexadecimal integer: "0xabcdef"
+
+Testing for must not include above uppercase F
+Input:			./tokenizer "0xABCDEFG"
+Expected Output:	hexadecimal integer: "0xABCDEF"
+			word: "G"
+
+Testing for must not include above lowercase f
+Input:			./tokenizer "0xabcdefg"
+Expected Output:	hexadecimal integer: "0xabcdef"
+			word: "g"
+
+Testing for no 0
+Input:			./tokenizer "xA8"
+Expected Output:	word: "xA"
+			decimal integer: "8"
+
+Testing Operators:
+
+Testing operators with only one possibility from 1st char
+Input:			./tokenizer "()[].,~?:"
+Expected Output:	left parenthesis: "("
+			right parenthesis: ")"
+			left bracket: "["
+			right bracket: "]"
+			structure member: "."
+			comma: ","
+			1s complement: "~"
+			conditional true: "?"
+			conditional false: ":"
+
+Testing '<' and '>' characters
+Input:			./tokenizer ">>=>>>=><<=<<<=<"
+Expected output:	shift right equals: ">>="
+			shift right: ">>"
+			greater than or equal to test: ">="
+			greater than test: ">"
+			shift left equals: "<<="
+			shift left "<<"
+			less than or equal to test: "<="
+			less than test: "<"
+
+Testing '|', '&', and '^' characters
+Input:			./tokenizer "|||=|&&&^^="
+Expected Output:	logical or: "||"
+			bitwise or equals: "|="
+			bitwise or: "|"
+			logical and: "&&"
+			AND/address operator: "&"
+			bitwise XOR: "^"
+			bitwise XOR equals: "^="
+
+Testing '+', '-', '/', '*', and '%' characters
+Input:			./tokenizer "+++=+---=->-//=**=%%="
+Expected Output:	increment: "++"
+			plus equals: "+="
+			addition: "+"
+			decrement: "--"
+			minus equals: "-="
+			structure pointer: "->"
+			subtraction: "-"
+			division: "/"
+			divide equals: "/="
+			modulus: "%"
+			mod equals: "%="
+
+Testing '!' (have to test these individually due to bash problem)
+Input:			./tokenizer "!"
+Expected output:	negation: "negation"
+
+Testing "!="
+Input:			./tokenizer "!="
+Expected outut:		inequality test: "!="
+
+Testing '=' char
+Input:			./tokenizer "==="
+Expected output:	equality test: "=="
+			assignment: "="
+
+Testing structure pointer (word repeats structure member as per reference card)
+Input:			./tokenizer "..world."
+Expected output:	structure member: "."
+			structure member: "world"
+			word: "world"
+			structure pointer: "."
+
+Testing Whitespace Characters:
+
+Testing spaces inbetween
+Input:			./tokenizer "Hello World Wazzup"
+Expected Output:	word: "Hello"
+			word: "World"
+			word: "Wazzup"
+
+Testing spaces in the front
+Input:			./tokenizer "          Hello World Wazzup"
+Expected Output:	word: "Hello"
+			word: "World"
+			word: "Wazzup"
+
+Testing spaces in the back
+Input:			./tokenizer "         Hello World Wazzup          "
+Expected Output:	word: "Hello"
+			word: "World"
+			word: "Wazzup"
+
+Testing Invalid characters (ones not mention in the reference card) 
+('#' doesn't exist in the my code so if it applies here it should apply for all unless it has to do with some unix command)
+Input:			./tokenizer "#"
+Output: 		INVALID TYPE: "#"
+
+Testing invalid inbetween
+Input:			./tokenizer "Hello#World#Wazzup"
+Expected Output:	word: "Hello"
+			INVALID TYPE: "#"
+			word: "World"
+			INVALID TYPE: "#"
+			word: "Wazzup"
+
+Testing operators inbetween:
+Input:			./tokenizer "Hello+= World-Wazzup/=0.112e-5"
+Expected Output:	word: "Hello"
+			plus equals: "+="
+			word: "World"
+			subtraction: "-"
+			word: "Wazzup"
+			divide equals: "/="
+			floating point: "0.112e-5
+
+Reference card test cases
+
+Input:			./tokenizer "array[xyz ] += pi 3.14159e-10"
+Expected Output:	word: "array"
+			left bracket: "["
+			word: "xyz"
+			right bracket: "]"
+			plus equals: "+="
+			word: "pi"
+			float: "3.141519e-10"
+
+
+Input:			./tokenizer "numbers 972 0x972 A8 0XA8 XA8 0972 072"
+Expected Output:	word: "numbers"
+			decimal integer: "972"
+			hexadecimal integer: "0x972"
+			word: "A8"
+			hexadecimal integer: "0XA8"
+			word: "XA8"
+			decimal integer: "0972"
+			octal integer: "072"
+
+
+Input:			./tokenizer "3.1 03.1 x3.1 0x3.1 30x1.x"
+Expected Output:	floating point: "3.1"
+			floating point: "03.1"
+			word: "x3"
+			structure member: "."
+			decimal integer: "1"
+			hexadecimal integer: "0x3"
+			structure member: "."
+			decimal integer: "1"
+			decimal integer: "30"
+			word: "x1"
+			structure member: "x"
+			word: "x"
+
+
+Input:			./tokenizer "+,++,+++,++++,+++++,++=,+++=="
+			Expected output:	addition: "+"
+			comma: ","
+			increment: "++"
+			comma: ","
+			increment: "++"
+			addition: "+"
+			comma: ","
+			increment: "++"
+			increment: "++"
+			comma: ","
+			increment: "++"
+			increment: "++"
+			addition: "+"
+			comma: ","
+			increment: "++"
+			assignment: "="
+			comma: ","
+			increment: "++"
+			plus equals: "+="
+			assignment: "="
